@@ -15,7 +15,9 @@ CNOT = np.array([[1,0,0,0],\
                  [0,0,1,0]])
 
 #Hadamard Transform
-def H(n):
+def HFT(n):
     if n == 1:
         return H
-    return np.kron(H(n-1),H)
+    return np.kron(HFT(n-1),H)
+
+print(HFT(2))
