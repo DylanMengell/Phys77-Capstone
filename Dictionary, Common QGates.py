@@ -20,4 +20,4 @@ def HFT(n):
         return H
     return np.kron(HFT(n-1),H)
 
-print(HFT(2))
+print(HFT(3))
