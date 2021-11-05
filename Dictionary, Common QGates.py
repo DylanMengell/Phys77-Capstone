@@ -89,19 +89,18 @@ def QSimulator(gates, wires, n):
     modified_gates = []
     for a in range(len(gates)):
         current_gate = gates[a]
-        current_wires = wires[a]
         current_N = len(current_gate)
+        current_n = int(np.log2(current_N))
         modified_gate = np.zeros([N,N])
         for i in range(current_N):
             for j in range(current_N):
-                if current_gate[i,j]==0:
-                    break
                 #i --> column index; j --> row index
+                current_wires = wires[a]
                 elementary = []
                 rawbitstringi = format(i,'b')
-                bitstringi = '0'*(n-len(rawbitstringi))+rawbitstringi
+                bitstringi = '0'*(current_n-len(rawbitstringi))+rawbitstringi
                 rawbitstringj = format(j,'b')
-                bitstringj = '0'*(n-len(rawbitstringj))+rawbitstringj
+                bitstringj = '0'*(current_n-len(rawbitstringj))+rawbitstringj
                 for x in range(n):
                     if current_wires != [] and x+1 == current_wires[0]:
                         elementary.append(bra_ket(bitstringi[0],bitstringj[0]))
@@ -110,16 +109,13 @@ def QSimulator(gates, wires, n):
                         current_wires = current_wires[1:]
                     else:
                         elementary.append(np.identity(2))
-                print("Elementary")
-                print(elementary)
                 modified_gate += current_gate[i,j]*reduce(np.kron,elementary)
         modified_gates.append(modified_gate)
     print("Modified Gates")
     print(modified_gates)
     for a in range(len(modified_gates)):
-        state = np.dot(modified_gates[len(modified_gates)-a-1],state)
+        state = np.dot(modified_gates[a],state)
     return measure(state)
 
-test = QSimulator([H],[[1]],2)
+test = [QSimulator([H, CNOT],[[1],[1,2]],2) for i in range(10)]
 print(test)
-print(np.kron(H,np.identity(2)))
