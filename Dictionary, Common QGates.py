@@ -123,9 +123,3 @@ def QSimulator(gates, wires, n):
 test = QSimulator([H],[[1]],2)
 print(test)
 print(np.kron(H,np.identity(2)))
-
-
-
-        
-
-
