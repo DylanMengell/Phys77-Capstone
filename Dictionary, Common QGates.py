@@ -2,8 +2,6 @@ import numpy as np
 from cmath import polar
 from functools import reduce
 
-from numpy.core.defchararray import _mod_dispatcher
-
 #Hadamard Gate
 H = 0.5**0.5 * np.array([[1, 1],\
                          [1, -1]]) 
@@ -76,6 +74,7 @@ def bra_ket(bitstring1,bitstring2):
     output[binaryToDecimal(bitstring1),binaryToDecimal(bitstring2)] = 1
     return output
 
+#Main Code, Quantum Simulator with Measurement
 def QSimulator(gates, wires, n):
     """Takes a LIST of gates (e.g. [H,CNOT,DFT]) and a nested list wires (e.g. [[1],[1,3],[1,2,3,4]])
     
@@ -111,11 +110,10 @@ def QSimulator(gates, wires, n):
                         elementary.append(np.identity(2))
                 modified_gate += current_gate[i,j]*reduce(np.kron,elementary)
         modified_gates.append(modified_gate)
-    print("Modified Gates")
-    print(modified_gates)
     for a in range(len(modified_gates)):
         state = np.dot(modified_gates[a],state)
     return measure(state)
 
+#Test with EPR Pair; should get 50% '00' and 50% '11'
 test = [QSimulator([H, CNOT],[[1],[1,2]],2) for i in range(10)]
 print(test)
