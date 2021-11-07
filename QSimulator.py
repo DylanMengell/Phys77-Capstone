@@ -87,29 +87,44 @@ def QSimulator(gates, wires, n):
     #use tensor product to make all gates act on all qubits
     modified_gates = []
     for a in range(len(gates)):
+        #define current gate and wires we're working with
         current_gate = gates[a]
+        current_wires = wires[a]
+        #define the N and n of current_gate (not to be confused with N and n of total circuit)
         current_N = len(current_gate)
         current_n = int(np.log2(current_N))
-        current_wires = wires[a]
+        #initialize modified gate to be zero N by N matrix
         modified_gate = np.zeros([N,N])
+        #iterate over all cells in matrix of current_gate
         for i in range(current_N):
             for j in range(current_N):
+                #if current_gate[i,j] == 0, no need to proceed
+                if current_gate[i,j] == 0:
+                    continue
                 #i --> column index; j --> row index
-                m = 0 #bit index 0<=m<n
+                m = 0 #bit index (0<=m<n)
+                #construct elementary member of decomposition of modified_gate 
                 elementary = [np.identity(2)]*n
+                #turn i and j into current_n-bit strings
                 rawbitstringi = format(i,'b')
                 bitstringi = '0'*(current_n-len(rawbitstringi))+rawbitstringi
                 rawbitstringj = format(j,'b')
                 bitstringj = '0'*(current_n-len(rawbitstringj))+rawbitstringj
+                #iterate over wires
                 for x in current_wires:
+                    #implement key pattern in elementary decompositions (KEY PART OF CODE)
                     elementary[x-1] = bra_ket(bitstringi[m],bitstringj[m])
                     m += 1
+                #construct modified_gate from each elementary decomposition
                 modified_gate += current_gate[i,j]*reduce(np.kron,elementary)
+        #fill list of modified_gates
         modified_gates.append(modified_gate)
+    #perform quantum computation with matrix multiplication
     for a in range(len(modified_gates)):
         state = np.dot(modified_gates[a],state)
+    #return bitstring corresponding to random measurement of state
     return measure(state)
 
-#Test with EPR Pair; should get 50% '000' and 50% '101'
+#Test with 3 qubits; should get 50% '000' and 50% '101'
 test = [QSimulator([H, CNOT],[[1],[1,3]],3) for i in range(10)]
 print(test)
