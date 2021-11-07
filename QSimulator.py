@@ -90,30 +90,26 @@ def QSimulator(gates, wires, n):
         current_gate = gates[a]
         current_N = len(current_gate)
         current_n = int(np.log2(current_N))
+        current_wires = wires[a]
         modified_gate = np.zeros([N,N])
         for i in range(current_N):
             for j in range(current_N):
                 #i --> column index; j --> row index
-                current_wires = wires[a]
-                elementary = []
+                m = 0 #bit index 0<=m<n
+                elementary = [np.identity(2)]*n
                 rawbitstringi = format(i,'b')
                 bitstringi = '0'*(current_n-len(rawbitstringi))+rawbitstringi
                 rawbitstringj = format(j,'b')
                 bitstringj = '0'*(current_n-len(rawbitstringj))+rawbitstringj
-                for x in range(n):
-                    if current_wires != [] and x+1 == current_wires[0]:
-                        elementary.append(bra_ket(bitstringi[0],bitstringj[0]))
-                        bitstringi = bitstringi[1:]
-                        bitstringj = bitstringj[1:]
-                        current_wires = current_wires[1:]
-                    else:
-                        elementary.append(np.identity(2))
+                for x in current_wires:
+                    elementary[x-1] = bra_ket(bitstringi[m],bitstringj[m])
+                    m += 1
                 modified_gate += current_gate[i,j]*reduce(np.kron,elementary)
         modified_gates.append(modified_gate)
     for a in range(len(modified_gates)):
         state = np.dot(modified_gates[a],state)
     return measure(state)
 
-#Test with EPR Pair; should get 50% '00' and 50% '11'
-test = [QSimulator([H, CNOT],[[1],[1,2]],2) for i in range(10)]
+#Test with EPR Pair; should get 50% '000' and 50% '101'
+test = [QSimulator([H, CNOT],[[1],[1,3]],3) for i in range(10)]
 print(test)
