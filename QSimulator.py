@@ -74,6 +74,14 @@ def bra_ket(bitstring1,bitstring2):
     output[binaryToDecimal(bitstring1),binaryToDecimal(bitstring2)] = 1
     return output
 
+def tensor_product(a,b):
+    shape_a = np.shape(a)
+    shape_b = np.shape(b)
+    a = a[:,np.newaxis,:,np.newaxis]
+    a = a[:,np.newaxis,:,np.newaxis]*b[np.newaxis,:,np.newaxis,:]
+    a.shape = (shape_a[0]*shape_b[0],shape_a[1]*shape_b[1])
+    return a
+
 #Main Code, Quantum Simulator with Measurement
 def QSimulator(gates, wires, n):
     """Takes a LIST of gates (e.g. [H,CNOT,DFT]) and a nested list wires (e.g. [[1],[1,3],[1,2,3,4]])
@@ -107,16 +115,16 @@ def QSimulator(gates, wires, n):
                 elementary = [np.identity(2)]*n
                 #turn i and j into current_n-bit strings
                 rawbitstringi = format(i,'b')
-                bitstringi = '0'*(current_n-len(rawbitstringi))+rawbitstringi
+                bitstringi = ('0'*(current_n-len(rawbitstringi)))+rawbitstringi
                 rawbitstringj = format(j,'b')
-                bitstringj = '0'*(current_n-len(rawbitstringj))+rawbitstringj
+                bitstringj = ('0'*(current_n-len(rawbitstringj)))+rawbitstringj
                 #iterate over wires
                 for x in current_wires:
                     #implement key pattern in elementary decompositions (KEY PART OF CODE)
                     elementary[x-1] = bra_ket(bitstringi[m],bitstringj[m])
                     m += 1
                 #construct modified_gate from each elementary decomposition
-                modified_gate += current_gate[i,j]*reduce(np.kron,elementary)
+                modified_gate += current_gate[i,j]*reduce(tensor_product,elementary)
         #fill list of modified_gates
         modified_gates.append(modified_gate)
     #perform quantum computation with matrix multiplication
