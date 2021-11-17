@@ -37,40 +37,24 @@ def ShorsAlgo(N):
         if (N % 2) == 0:
             return ('The value is even please enter an odd N!')
 
-        #1 Pick a random number 1<a<N
-        non_trivial_divisor = np.random.randint(1,N,1)  #possibly find better random num gen
+        #1) Pick a random number 1<a<N
+        a = np.random.randint(1,N,1)  #possibly find better random num gen
 
-        #Compute K = GCD(a,N) using Euclidean Algorithm 
-        #works!
-        K = euclideanAlg(non_trivial_divisor, N)
+        #2) Compute K = GCD(a,N) using Euclidean Algorithm 
+        K = euclideanAlg(a, N)
 
-        #3
-        if K != 1:
+        #3) Check K
+        if K != 1: #If if K!=1 then it is non trivial(i.e. it is a factor)
             non_trivial_factor = K #WE DID IT, no quantum needed
-            print('Your GCD is: ', non_trivial_factor)
-        elif K == 1:
-            print('The values are Coprime. Your GCD is 1, therefore we must continue to step 4.')
+            return non_trivial_factor
 
         #4 Use the quantum period-finding subroutine to find r
         #(non_trivial_divisor)**p = m * N +1
 
-        #Need to create a way to test out an infinite number of values 
-        #for p and m, including fractions
+        r = QuantPeriodFinding() #yet to be made but will return r
 
-        #leave this up to quauntum computing
-
-        #5 if r is odd, go back to step 1
-        if (r % 2) == 0:
-            non_trivial_divisor = np.random.randint(0,N,1) 
-        #6 if a^(r/2) = -1(mod(N)) go back to step 1
-
-        # 7 other wise 
-        # K1 = euclideanAlg((a**(r/2) + 1, N)
-        # and 
-        # K2 = euclideanAlg((a**(r/2) - 1, N)
-        #^^ these are the non_trivial_factors of N
-            
-        #goal = find non_trivial_factor
-
-
-        #==============add parts 5 and 6 to end inf loop
+        #5 if r is even and if a^r/2 != -1%N then the factors are as such:
+        if ((r % 2) == 0) and (a**(r/2) != (-1)%N): #should this be 'and' or 'or'????
+            non_trivial_divisor1 = euclideanAlg(a**(r/2) + 1, N)
+            non_trivial_divisor2 = euclideanAlg(a**(r/2) - 1, N)
+            return non_trivial_divisor1, non_trivial_divisor2
