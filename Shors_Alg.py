@@ -120,6 +120,20 @@ def Q(f, n_input):
             output[binaryToDecimal(bit_x+modified_output),binaryToDecimal(bit_x+bit_b)] = 1
     return output
 
+def is_prime(N: int) -> bool:
+    if N <= 3:
+        return N > 1
+    if N % 2 == 0:
+        return False
+    if N % 3 == 0:
+        return False
+    i = 5
+    while i ** 2 <= N:
+        if N % i == 0 or N % (i+2) == 0:
+            return False
+        i += 6
+    return True
+
 def euclideanAlg(a,N): 
     """euclidean algorithm for finding GCD"""
     if (a==0):
@@ -200,7 +214,10 @@ def ShorsAlgo(N):
     isdone = True
     while not (isdone):
         if (N % 2) == 0:
-            return ('The value is even please enter an odd N!')
+            return (2, N/2)
+        if is_prime(N) == True:
+            return("No solution")
+
 
         #1) Pick a random number 1<a<N
         a = np.random.randint(1,N,1)  #possibly find better random num gen
