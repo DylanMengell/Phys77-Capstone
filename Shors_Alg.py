@@ -2,7 +2,12 @@
 import numpy as np
 
 
-def QuantPeriodFinding(): #quantum Period finding algorthm Should return r
+def internalQuantPerFind(N, a, size):
+
+    return 0 #will return a set of bit strings of length 'size'
+
+
+def QuantPeriodFinding(N, a): #quantum Period finding algorthm Should return r
     """
     def part4(X,Y): #(Non_trivial_divisor, N)
         p = np.linspace(1,Y)
@@ -22,6 +27,24 @@ def QuantPeriodFinding(): #quantum Period finding algorthm Should return r
     a = findBettera(p,m,N)
     print(a)
     """
+
+    #take a set of bit strings of size 'size' 
+    #convert bitstring to base 10
+    #divide resulting number by 2^(number of bits of string)
+    #then there will be a number r that multiplies by this string to get an integer.
+    #r must be 1 < r < 2N
+
+    size = 1000
+    bitstrings = internalQuantPerFind(N, a, size) 
+    base10vals, numbits, fractionalVals = [], [], []
+
+    for i in range(size):
+         base10vals.append(int(bitstrings[i], 2)) #converts value to base 10
+         numbits.append(len(bitstrings[i])) #stores the number of bits in given string
+         fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
+    
+    #make a loop that finds the best value of r by totaling the remainders of each calculation and minimizing that value
+
     return 0
 
 def euclideanAlg(a,N): #Euclidean algorithm for finding GCD
