@@ -4,6 +4,17 @@ from cmath import polar, exp
 
 #Some Useful Functions for Matrix Implementation of QComputing
 
+def tensor_product(a,b):
+    """fast tensor product
+    
+    from https://stackoverflow.com/questions/56067643/speeding-up-kronecker-products-numpy"""
+    shape_a = np.shape(a)
+    shape_b = np.shape(b)
+    a = a[:,np.newaxis,:,np.newaxis]
+    a = a[:,np.newaxis,:,np.newaxis]*b[np.newaxis,:,np.newaxis,:]
+    a.shape = (shape_a[0]*shape_b[0],shape_a[1]*shape_b[1])
+    return a
+
 H = 0.5**0.5 * np.array([[1, 1],\
                          [1, -1]]) 
 
@@ -11,7 +22,7 @@ def HFT(n):
     """Hadamard Transform"""
     if n == 1:
         return H
-    return np.kron(HFT(n-1),H)
+    return tensor_product(HFT(n-1),H)
 
 def DFT(N):
     """Discrete Fourier Transform"""
@@ -81,17 +92,6 @@ def binaryToDecimal(bitstring):
         binary = binary//10
         i += 1
     return decimal 
-
-def tensor_product(a,b):
-    """fast tensor product
-    
-    from https://stackoverflow.com/questions/56067643/speeding-up-kronecker-products-numpy"""
-    shape_a = np.shape(a)
-    shape_b = np.shape(b)
-    a = a[:,np.newaxis,:,np.newaxis]
-    a = a[:,np.newaxis,:,np.newaxis]*b[np.newaxis,:,np.newaxis,:]
-    a.shape = (shape_a[0]*shape_b[0],shape_a[1]*shape_b[1])
-    return a
 
 def Q(f, n_input):
     """generates matrix which implements classical function quantumly
