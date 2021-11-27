@@ -167,45 +167,35 @@ def internalQuantPerFind(N, a, size):
 
 #Simon's Period-Finding Alg. (Part 2, Using Bitstrings to Find Period) (returns bitstrings)
 
-def QuantPeriodFinding(N, a): #quantum Period finding algorthm Should return r
+def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorthm Should return r
     """
-    def part4(X,Y): #(Non_trivial_divisor, N)
-        p = np.linspace(1,Y)
-        for j in p:
-            m = np.linspace(1,Y)
-            for l in m:
-                #remember j and l are m and p
-                if ((X**j) == (l * Y) + 1): #ERROR HERE
-                    return (j,l)
-
-    p,m = part4(non_trivial_divisor, N)
-    #goal find a better a
-    def findBettera (p,m,N):
-        a = ((m * N) + 1)**p
-        return a
-
-    a = findBettera(p,m,N)
-    print(a)
+    QuantPeriodFinding finds the period 'r' of the functon (a^x)Mod(N)
+    
+    args: 
+        N: number to be factored
+        a: random guess to help find factors of N
+    
+    returns: 
+        r: is the period of the function (a^x)Mod(N) which will help us find factors of N
     """
-
-    """take a set of bit strings of size 'size' 
-    convert bitstring to base 10
-    divide resulting number by 2^(number of bits of string)
-    then there will be a number r that multiplies by this string to get an integer.
-    r must be 2 < r < N/2"""
-
     size = 1000
     bitstrings = internalQuantPerFind(N, a, size) 
-    base10vals, numbits, fractionalVals = [], [], []
+    base10vals, numbits, fractionalVals, remainders, remainderTotals = [], [], [], [], []
 
     for i in range(size):
          base10vals.append(int(bitstrings[i], 2)) #converts value to base 10
          numbits.append(len(bitstrings[i])) #stores the number of bits in given string
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
-    
-    #make a loop that finds the best value of r by totaling the remainders of each calculation and minimizing that value
 
-    return 0
+    minremainder, Rforminremainder = 10000, 1
+    for r in range(2, N/2):
+        for i in range(size):
+            remainders.append((fractionalVals[i]*r)%1.0)
+        remainderTotals.append(np.sum(remainders))
+        if(remainderTotals[i] < minremainder):
+            minremainder = remainderTotals[i]
+            Rforminremainder = r    
+    return Rforminremainder
 
 #Main Code: Shor's Algorithm
 
@@ -240,3 +230,6 @@ def ShorsAlgo(N):
             non_trivial_divisor1 = euclideanAlg(a**(r/2) + 1, N)
             non_trivial_divisor2 = euclideanAlg(a**(r/2) - 1, N)
             return non_trivial_divisor1, non_trivial_divisor2
+
+
+print(ShorsAlgo(4))
