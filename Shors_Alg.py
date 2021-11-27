@@ -190,7 +190,8 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
     minremainder, Rforminremainder = 10000, 1
     for r in range(2, N/2):
         for i in range(size):
-            remainders.append((fractionalVals[i]*r)%1.0)
+            temp = fractionalVals[i]*r
+            remainders.append(temp%int(temp))
         remainderTotals.append(np.sum(remainders))
         if(remainderTotals[i] < minremainder):
             minremainder = remainderTotals[i]
