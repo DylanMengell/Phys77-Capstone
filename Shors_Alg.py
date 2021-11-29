@@ -79,20 +79,6 @@ def measure(state):
             return '0'*(n-len(rawoutput))+rawoutput
         random -= pdf[i]
 
-def binaryToDecimal(bitstring):
-    """takes bitstring 
-    returns decimal equivalent
-    
-    from: https://www.geeksforgeeks.org/binary-decimal-vice-versa-python/"""
-    binary = int(bitstring)
-    decimal, i = 0, 0
-    while(binary != 0):
-        dec = binary % 10
-        decimal = decimal + dec * pow(2, i)
-        binary = binary//10
-        i += 1
-    return decimal 
-
 def Q(f, n_input):
     """generates matrix which implements classical function quantumly
     f should be a function from {0,1}^n_input --> {0,1}^m for some int m"""
@@ -117,9 +103,10 @@ def Q(f, n_input):
             raw_b = format(b,"b")
             bit_b = ('0'*(n_output-len(raw_b)))+raw_b
             modified_output = bitwiseXOR(bit_b,bit_output)
-            output[binaryToDecimal(bit_x+modified_output),binaryToDecimal(bit_x+bit_b)] = 1
+            output[int(bit_x+modified_output,2),int(bit_x+bit_b,2)] = 1
     return output
 
+#"""Asher: Writing a function like this may be cheating a little too much..."""
 def is_prime(N: int) -> bool:
     if N <= 3:
         return N > 1
@@ -151,17 +138,16 @@ def internalQuantPerFind(N, a, size):
     
     def f(x):
         return (a**x)%N
-    
+
     compute = Q(f,n)
     n_total = int(math.log2(np.shape(compute)[0]))
 
     rotate1 = tensor_product(HFT(n),np.identity(2**(n_total-n)))
     rotate2 = tensor_product(IDFT(2**n),np.identity(2**(n_total-n)))
-
-    sequence = [rotate1,compute,rotate2]
+ 
     state = np.zeros(2**n_total)
     state[0] = 1
-    for gate in sequence:
+    for gate in [rotate1,compute,rotate2]:
         state = np.dot(gate,state)
     return [measure(state)[0:n] for i in range(size)] #will return a list of bitstrings of length 'size'
 
@@ -188,14 +174,17 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
 
     minremainder, Rforminremainder = 10000, 1
-    for r in range(2, N/2):
+    #Asher: Note --> N/2
+    for r in range(2, N/2): 
         for i in range(size):
             temp = fractionalVals[i]*r
-            remainders.append(temp%int(temp))
+            remainders.append(temp%int(temp)) #Asher: Note --> min(temp-int(temp),int(temp)+1-temp)
         remainderTotals.append(np.sum(remainders))
+        #Asher: Note --> for loop here for i?
         if(remainderTotals[i] < minremainder):
             minremainder = remainderTotals[i]
-            Rforminremainder = r    
+            Rforminremainder = r
+        #Asher: Note --> extra check for r/2, r/3, r/4    
     return Rforminremainder
 
 #Main Code: Shor's Algorithm
@@ -205,18 +194,17 @@ def ShorsAlgo(N):
     isdone = False
     while not (isdone == True):
         if (N % 2) == 0:
-            return (2, N/2)
-            isdone == True
+            return 2, N/2
+            isdone == True #Asher: Note --> unnecessary; return statements break out of functions
         if (N % 3) == 0:
-            return (3, N/3)
+            return 3, N/3
             isdone == True
         if is_prime(N) == True:
             return("No solution")
             isdone == True
 
-
         #1) Pick a random number 1<a<N
-        a = np.random.randint(1,N,1)  #possibly find better random num gen
+        a = np.random.randint(1,N)  #possibly find better random num gen
 
         #2) Compute K = GCD(a,N) using Euclidean Algorithm 
         K = euclideanAlg(a, N)
@@ -238,4 +226,4 @@ def ShorsAlgo(N):
             return non_trivial_divisor1, non_trivial_divisor2
 
 
-print(ShorsAlgo(9))
+print(ShorsAlgo(7*13)) #better example
