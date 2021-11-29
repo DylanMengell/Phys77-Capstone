@@ -207,6 +207,9 @@ def ShorsAlgo(N):
         if (N % 2) == 0:
             return (2, N/2)
             isdone == True
+        if (N % 3) == 0:
+            return (3, N/3)
+            isdone == True
         if is_prime(N) == True:
             return("No solution")
             isdone == True
@@ -226,7 +229,7 @@ def ShorsAlgo(N):
         #4 Use the quantum period-finding subroutine to find r
         #(non_trivial_divisor)**p = m * N +1
 
-        r = QuantPeriodFinding() #yet to be made but will return r
+        r = QuantPeriodFinding(N, a) #yet to be made but will return r
 
         #5 if r is even and if a^r/2 != -1%N then the factors are as such:
         if ((r % 2) == 0) and (a**(r/2) != (-1)%N): #should this be 'and' or 'or'????
