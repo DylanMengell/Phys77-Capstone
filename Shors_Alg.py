@@ -202,12 +202,14 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
 
 #Put the Composite Number Here
 def ShorsAlgo(N):
-    isdone = True
-    while not (isdone):
+    isdone = False
+    while not (isdone == True):
         if (N % 2) == 0:
             return (2, N/2)
+            isdone == True
         if is_prime(N) == True:
             return("No solution")
+            isdone == True
 
 
         #1) Pick a random number 1<a<N
@@ -233,4 +235,4 @@ def ShorsAlgo(N):
             return non_trivial_divisor1, non_trivial_divisor2
 
 
-print(ShorsAlgo(4))
+print(ShorsAlgo(9))
