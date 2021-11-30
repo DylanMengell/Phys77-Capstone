@@ -129,6 +129,19 @@ def euclideanAlg(a,N):
     else:
         return euclideanAlg(N % a, a)
 
+def visualize_f(N,a):
+    def f(x):
+        return (a**x)%N
+    #plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html 
+    x = a
+    y = f(x)
+    plt.plot(x, y)
+    plt.ylabel(a, "^x mod", N)
+    plt.xlabel("x")
+    plt.title("Periodic Function in Shor's Alg.")
+    plt.show()
+
+
 #Simon's Period-Finding Alg. (Part 1, Quantum Computation) (returns bitstrings)
 
 def internalQuantPerFind(N, a, size):
@@ -228,17 +241,7 @@ def ShorsAlgo(N):
         #4 Use the quantum period-finding subroutine to find r
 
         r = QuantPeriodFinding(N, a) #yet to be made but will return r
-        #PLOT
-        """
-        plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html 
-        x = r
-        y = (a ** x % N)
-        plt.figure(figsize=(8,8))
-        plt.plot(x, y)
-        plt.ylabel(a, "^x mod", N)
-        plt.xlabel("x")
-        plt.title("Periodic Function in Shor's Alg.")
-        """
+
 
         #5 if r is even and if a^r/2 != -1%N then the factors are as such:
         if ((r % 2) == 0) and (a**(r/2) != (-1)%N): #should this be 'and' or 'or'????
