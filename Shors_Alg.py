@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from cmath import polar, exp
+#import matplotlib.pyplot as plt
 
 #Some Useful Functions for Matrix Implementation of QComputing
 
@@ -225,9 +226,19 @@ def ShorsAlgo(N):
             return non_trivial_factor
 
         #4 Use the quantum period-finding subroutine to find r
-        #(non_trivial_divisor)**p = m * N +1
 
         r = QuantPeriodFinding(N, a) #yet to be made but will return r
+        #PLOT
+        """
+        plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html 
+        x = r
+        y = (a ** x % N)
+        plt.figure(figsize=(8,8))
+        plt.plot(x, y)
+        plt.ylabel(a, "^x mod", N)
+        plt.xlabel("x")
+        plt.title("Periodic Function in Shor's Alg.")
+        """
 
         #5 if r is even and if a^r/2 != -1%N then the factors are as such:
         if ((r % 2) == 0) and (a**(r/2) != (-1)%N): #should this be 'and' or 'or'????
