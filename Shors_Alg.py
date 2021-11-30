@@ -136,7 +136,7 @@ def visualize_f(N,a):
     x = np.arange(N)
     y = f(x)
     plt.plot(x, y)
-    plt.ylabel(a, "**x mod", N)
+    plt.ylabel("a**x mod")
     plt.xlabel("x")
     plt.title("Periodic Function in Shor's Alg.")
     plt.show()
@@ -223,6 +223,7 @@ def ShorsAlgo(N):
         #if is_prime(N) == True:
         #   return("No solution")
     isdone = False
+    periods_list = []
     while True:
         #1) Pick a random number 1<a<N
         a = np.random.randint(1,N)                                  #possibly find better random num gen
@@ -238,13 +239,14 @@ def ShorsAlgo(N):
         #4 Use the quantum period-finding subroutine to find r
 
         r = QuantPeriodFinding(N, a)                                #yet to be made but will return r
-        visualize_f(N,a)                                            #run the visualize program 
 
         #5 if r is even and if a^r/2 != -1%N then the factors are as such:
         if ((r % 2) == 0) and (a**(r/2) != (-1)%N):                 #should this be 'and' or 'or'????
             non_trivial_divisor1 = euclideanAlg(a**(r/2) + 1, N)
             non_trivial_divisor2 = euclideanAlg(a**(r/2) - 1, N)
             return non_trivial_divisor1, non_trivial_divisor2
+
+    visualize_f(N,a)
 
 
 print(ShorsAlgo(7*13)) #better example
