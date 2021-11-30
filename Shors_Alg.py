@@ -108,7 +108,7 @@ def Q(f, n_input):
     return output
 
 #"""Asher: Writing a function like this may be cheating a little too much..."""
-def is_prime(N: int) -> bool:
+"""def is_prime(N: int) -> bool:
     if N <= 3:
         return N > 1
     if N % 2 == 0:
@@ -121,7 +121,7 @@ def is_prime(N: int) -> bool:
             return False
         i += 6
     return True
-
+"""
 def euclideanAlg(a,N): 
     """euclidean algorithm for finding GCD"""
     if (a==0):
@@ -133,10 +133,10 @@ def visualize_f(N,a):
     def f(x):
         return (a**x)%N
     #plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html 
-    x = a
+    x = np.arange(N)
     y = f(x)
     plt.plot(x, y)
-    plt.ylabel(a, "^x mod", N)
+    plt.ylabel(a, "**x mod", N)
     plt.xlabel("x")
     plt.title("Periodic Function in Shor's Alg.")
     plt.show()
@@ -215,36 +215,33 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
 
 #Put the Composite Number Here
 def ShorsAlgo(N):
-    isdone = False
-    while not (isdone == True):
-        if (N % 2) == 0:
+    if (N % 2) == 0:
             return 2, N/2
-            isdone == True #Asher: Note --> unnecessary; return statements break out of functions
-        if (N % 3) == 0:
+#Asher: Note --> unnecessary; return statements break out of functions
+    if (N % 3) == 0:
             return 3, N/3
-            isdone == True
-        if is_prime(N) == True:
-            return("No solution")
-            isdone == True
-
+        #if is_prime(N) == True:
+        #   return("No solution")
+    isdone = False
+    while True:
         #1) Pick a random number 1<a<N
-        a = np.random.randint(1,N)  #possibly find better random num gen
+        a = np.random.randint(1,N)                                  #possibly find better random num gen
 
         #2) Compute K = GCD(a,N) using Euclidean Algorithm 
         K = euclideanAlg(a, N)
 
         #3) Check K
-        if K != 1: #If if K!=1 then it is non trivial(i.e. it is a factor)
-            non_trivial_factor = K #WE DID IT, no quantum needed
+        if K != 1:                                                  #If if K!=1 then it is non trivial(i.e. it is a factor)
+            non_trivial_factor = K                                  #WE DID IT, no quantum needed
             return non_trivial_factor
 
         #4 Use the quantum period-finding subroutine to find r
 
-        r = QuantPeriodFinding(N, a) #yet to be made but will return r
-
+        r = QuantPeriodFinding(N, a)                                #yet to be made but will return r
+        visualize_f(N,a)                                            #run the visualize program 
 
         #5 if r is even and if a^r/2 != -1%N then the factors are as such:
-        if ((r % 2) == 0) and (a**(r/2) != (-1)%N): #should this be 'and' or 'or'????
+        if ((r % 2) == 0) and (a**(r/2) != (-1)%N):                 #should this be 'and' or 'or'????
             non_trivial_divisor1 = euclideanAlg(a**(r/2) + 1, N)
             non_trivial_divisor2 = euclideanAlg(a**(r/2) - 1, N)
             return non_trivial_divisor1, non_trivial_divisor2
