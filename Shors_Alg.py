@@ -166,26 +166,36 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
     """
     size = 1000
     bitstrings = internalQuantPerFind(N, a, size) 
-    base10vals, numbits, fractionalVals, remainders, remainderTotals = [], [], [], [], []
+    base10vals, numbits, fractionalVals, remainderTotals = [], [], [], []
 
     for i in range(size):
          base10vals.append(int(bitstrings[i], 2)) #converts value to base 10
          numbits.append(len(bitstrings[i])) #stores the number of bits in given string
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
 
-    minremainder, Rforminremainder = 10000, 1
-    #Asher: Note --> N/2
-    for r in range(2, N/2): 
+    minremainder, Rforminremainder, indexCount = 10000, 1, 0
+    for r in range(2, int(N/2)): 
+        remainders = [] 
         for i in range(size):
             temp = fractionalVals[i]*r
-            remainders.append(temp%int(temp)) #Asher: Note --> min(temp-int(temp),int(temp)+1-temp)
+            remainders.append(np.min(temp-int(temp),int(temp)+1-temp)) #Asher: Note --> min(temp-int(temp),int(temp)+1-temp)
         remainderTotals.append(np.sum(remainders))
-        #Asher: Note --> for loop here for i?
-        if(remainderTotals[i] < minremainder):
+        if(remainderTotals[indexCount] < minremainder):
             minremainder = remainderTotals[i]
             Rforminremainder = r
-        #Asher: Note --> extra check for r/2, r/3, r/4    
-    return Rforminremainder
+        indexCount += 1
+        #Asher: Note --> extra check for r/2, r/3, r/4 
+    #Not sure if this is correct
+    if a**(Rforminremainder/4)%N == 1:
+        return Rforminremainder/4
+    elif a**(Rforminremainder/3)%N == 1:
+        return Rforminremainder/3
+    elif a**(Rforminremainder/2)%N == 1:
+        return Rforminremainder/2
+    elif a**(Rforminremainder)%N == 1:
+        return Rforminremainder
+    else:
+        return 1
 
 #Main Code: Shor's Algorithm
 
