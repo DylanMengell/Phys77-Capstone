@@ -130,13 +130,18 @@ def euclideanAlg(a,N):
         return euclideanAlg(N % a, a)
 
 def visualize_f(N,a):
+    y =[]
+
     def f(x):
         return (a**x)%N
+
     #plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html 
     x = np.arange(N)
-    y = f(x)
+    for i in range(N):
+        b = f(i)
+        y.append(b)
     plt.plot(x, y)
-    plt.ylabel("a**x mod")
+    plt.ylabel("a**x mod N")
     plt.xlabel("x")
     plt.title("Periodic Function in Shor's Alg.")
     plt.show()
