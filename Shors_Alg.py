@@ -221,13 +221,6 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
 def ShorsAlgo(N):
     if (N % 2) == 0:
             return 2, N/2
-#Asher: Note --> unnecessary; return statements break out of functions
-    if (N % 3) == 0:
-            return 3, N/3
-        #if is_prime(N) == True:
-        #   return("No solution")
-    isdone = False
-    periods_list = []
     while True:
         #1) Pick a random number 1<a<N
         a = np.random.randint(1,N)                                  #possibly find better random num gen
@@ -244,7 +237,7 @@ def ShorsAlgo(N):
 
         r = QuantPeriodFinding(N, a)                                #yet to be made but will return r
 
-        #5 if r is even and if a^r/2 != -1%N then the factors are as such:
+        #5 & 6 If r is even and if a^r/2 != -1%N then the factors are as such:
         if ((r % 2) == 0) and (a**(r/2) != (-1)%N):                 #should this be 'and' or 'or'????
             non_trivial_divisor1 = euclideanAlg(a**(r/2) + 1, N)
             non_trivial_divisor2 = euclideanAlg(a**(r/2) - 1, N)
