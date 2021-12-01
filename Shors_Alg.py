@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from cmath import polar, exp
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 #Some Useful Functions for Matrix Implementation of QComputing
 
@@ -192,13 +192,12 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
         remainders = [] 
         for i in range(size):
             temp = fractionalVals[i]*r
-            remainders.append(np.min(temp-int(temp),int(temp)+1-temp)) #Asher: Note --> min(temp-int(temp),int(temp)+1-temp)
+            remainders.append(min(temp-int(temp),int(temp)+1-temp))
         remainderTotals.append(np.sum(remainders))
         if(remainderTotals[indexCount] < minremainder):
-            minremainder = remainderTotals[i]
+            minremainder = remainderTotals[indexCount]
             Rforminremainder = r
         indexCount += 1
-        #Asher: Note --> extra check for r/2, r/3, r/4 
     #Not sure if this is correct
     if a**(Rforminremainder/4)%N == 1:
         return Rforminremainder/4
@@ -249,4 +248,49 @@ def ShorsAlgo(N):
     visualize_f(N,a)
 
 
-print(ShorsAlgo(7*13)) #better example
+#print(ShorsAlgo(7*13)) #better example
+
+
+def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Should return r
+    """
+    periodgraph creates a graph the sum of remainders as a function of 'r'
+    
+    args: 
+        N: number to be factored
+        a: random guess to help find factors of N
+    
+    returns: 
+        r: Plot sum of remainders as a function of r
+    """
+    size = 1000
+    bitstrings = internalQuantPerFind(N, a, size) 
+    base10vals, numbits, fractionalVals, remainderTotals = [], [], [], []
+
+    for i in range(size):
+         base10vals.append(int(bitstrings[i], 2)) #converts value to base 10
+         numbits.append(len(bitstrings[i])) #stores the number of bits in given string
+         fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
+
+    minremainder, Rforminremainder, indexCount = 10000, 1, 0
+    rvals = list(range(2, int(N/2)))
+    print(rvals)
+    for r in range(2, int(N/2)): 
+        remainders = [] 
+        for i in range(size):
+            temp = fractionalVals[i]*r
+            remainders.append(min(temp-int(temp),int(temp)+1-temp)) #Asher: Note --> min(temp-int(temp),int(temp)+1-temp)
+        remainderTotals.append(np.sum(remainders))
+        if(remainderTotals[indexCount] < minremainder):
+            minremainder = remainderTotals[indexCount]
+            Rforminremainder = r
+        indexCount += 1
+    xticks = np.arange(0,N/2+1,2)
+    plt.figure(figsize=(12, 6), dpi=80)
+    plt.plot(rvals, remainderTotals, '--o')
+    plt.xticks(xticks)
+    plt.xlabel("r (period value)", fontsize = 12)
+    plt.ylabel("total remainder values", fontsize = 12)
+
+
+
+periodgraph(91, 15)
