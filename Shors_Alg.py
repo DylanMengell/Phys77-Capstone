@@ -52,13 +52,6 @@ def bitwiseXOR(string1, string2):
         output += str((int(string1[i])+int(string2[i]))%2)
     return output
 
-def amp_to_prob(cx_number):
-    """takes a complex number a+bi and returns its norm squared a^2+b^2
-    
-    this is how we get from an amplitude (the numbers stored in the column vector) 
-    to an actual probability"""
-    return polar(cx_number)[0]**2
-
 def measure(state):
     """takes a state (column vector) and returns a bit-string, simulating a measurement of the state
     
@@ -71,9 +64,9 @@ def measure(state):
     n = int(np.log2(N))
     #generate random number from 0 to 1
     random = np.random.random()
-    #generate pdf from quantum state
-    pdf = list(map(amp_to_prob,state))
-    #run through each element to determine measurement
+    #generate pdf from quantum state by taking norm squared of each amplitude
+    pdf = list(map(lambda complexnum: polar(complexnum)[0]**2,state))
+    #run through each element of pdf to determine measurement
     for i in range(len(pdf)):
         if random<pdf[i]:
             rawoutput = format(i,"b")
@@ -83,17 +76,21 @@ def measure(state):
 def Q(f, n_input):
     """generates matrix which implements classical function quantumly
     f should be a function from {0,1}^n_input --> {0,1}^m for some int m"""
+    #determine min number of bits necessary to represent all outputs
     possible_outputs = {}
     for x in range(2**n_input):
         possible_outputs[f(x)] = x
     N_output = len(list(possible_outputs.keys()))
     n_output = math.ceil(math.log2(N_output))
     output_to_bit = {}
+    #associate each output with a corresponding number (equivalent to bitstring)
     i = 0
     for f_output in list(possible_outputs.keys()):
         output_to_bit[f_output] = i
         i += 1
+    #generate matrix of correct size with all zeros
     output = np.zeros([2**(n_input+n_output),2**(n_input+n_output)])
+    #figure out where to insert 1s in order to make correct matrix
     for x in range(2**n_input):
         raw_bit_x = format(x,"b")
         bit_x = ('0'*(n_input-len(raw_bit_x)))+raw_bit_x
@@ -104,48 +101,15 @@ def Q(f, n_input):
             raw_b = format(b,"b")
             bit_b = ('0'*(n_output-len(raw_b)))+raw_b
             modified_output = bitwiseXOR(bit_b,bit_output)
-            output[int(bit_x+modified_output,2),int(bit_x+bit_b,2)] = 1
+            output[int(bit_x+modified_output,2),int(bit_x+bit_b,2)] = 1 #key line: implements qcomputing law for generating matrix of Qf
     return output
 
-#"""Asher: Writing a function like this may be cheating a little too much..."""
-"""def is_prime(N: int) -> bool:
-    if N <= 3:
-        return N > 1
-    if N % 2 == 0:
-        return False
-    if N % 3 == 0:
-        return False
-    i = 5
-    while i ** 2 <= N:
-        if N % i == 0 or N % (i+2) == 0:
-            return False
-        i += 6
-    return True
-"""
 def euclideanAlg(a,N): 
     """euclidean algorithm for finding GCD"""
-    if (a==0):
+    if a == 0:
         return N
     else:
         return euclideanAlg(N % a, a)
-
-def visualize_f(N,a):
-    y =[]
-
-    def f(x):
-        return (a**x)%N
-
-    #plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html 
-    x = np.arange(N)
-    for i in range(N):
-        b = f(i)
-        y.append(b)
-    plt.plot(x, y)
-    plt.ylabel("a**x mod N")
-    plt.xlabel("x")
-    plt.title("Periodic Function in Shor's Alg.")
-    plt.show()
-
 
 #Simon's Period-Finding Alg. (Part 1, Quantum Computation) (returns bitstrings)
 
@@ -158,30 +122,35 @@ def internalQuantPerFind(N, a, size):
     def f(x):
         return (a**x)%N
 
+    #generate compute gate
     compute = Q(f,n)
     n_total = int(math.log2(np.shape(compute)[0]))
 
+    #generate two rotations gates
     rotate1 = tensor_product(HFT(n),np.identity(2**(n_total-n)))
     rotate2 = tensor_product(IDFT(2**n),np.identity(2**(n_total-n)))
- 
+    
+    #execute quantum computation
     state = np.zeros(2**n_total)
     state[0] = 1
     for gate in [rotate1,compute,rotate2]:
         state = np.dot(gate,state)
+    
+    #measure final state "size" times
     return [measure(state)[0:n] for i in range(size)] #will return a list of bitstrings of length 'size'
 
-#Simon's Period-Finding Alg. (Part 2, Using Bitstrings to Find Period) (returns bitstrings)
+#Simon's Period-Finding Alg. (Part 2, Using Bitstrings to Find Period)
 
-def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorthm Should return r
+def QuantPeriodFinding(N : int, a : int) -> int:
     """
-    QuantPeriodFinding finds the period 'r' of the functon (a^x)Mod(N)
+    QuantPeriodFinding finds the period 'r' of the functon (a^x) mod N
     
     args: 
         N: number to be factored
         a: random guess to help find factors of N
     
     returns: 
-        r: is the period of the function (a^x)Mod(N) which will help us find factors of N
+        r: the period of the function (a^x) mod N, which will help us find factors of N
     """
     size = 1000
     bitstrings = internalQuantPerFind(N, a, size) 
@@ -220,7 +189,7 @@ def QuantPeriodFinding(N : int, a : int) -> int: #quantum Period finding algorth
 #Put the Composite Number Here
 def ShorsAlgo(N):
     if (N % 2) == 0:
-            return 2, N/2
+            return 2, int(N/2)
     while True:
         #1) Pick a random number 1<a<N
         a = np.random.randint(1,N)                                  #possibly find better random num gen
@@ -231,7 +200,7 @@ def ShorsAlgo(N):
         #3) Check K
         if K != 1:                                                  #If if K!=1 then it is non trivial(i.e. it is a factor)
             non_trivial_factor = K                                  #WE DID IT, no quantum needed
-            return non_trivial_factor
+            return non_trivial_factor, int(N/non_trivial_factor)
 
         #4 Use the quantum period-finding subroutine to find r
 
@@ -243,11 +212,25 @@ def ShorsAlgo(N):
             non_trivial_divisor2 = euclideanAlg(a**(r/2) - 1, N)
             return non_trivial_divisor1, non_trivial_divisor2
 
-    visualize_f(N,a)
+#Useful Visualization Functions (used to generate diagrams for presentation)
 
+def visualize_f(N,a):
+    """plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html"""
 
-#print(ShorsAlgo(7*13)) #better example
+    y = []
 
+    def f(x):
+        return (a**x)%N
+
+    x = np.arange(N)
+    for i in range(N):
+        b = f(i)
+        y.append(b)
+    plt.plot(x, y)
+    plt.ylabel(r"${0}^x$ mod ${1}$".format(a,N))
+    plt.xlabel(r"$x$")
+    plt.title(r"Periodic Function in Shor's Alg: $f(x)={0}^x$ mod ${1}$".format(a,N))
+    plt.show()
 
 def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Should return r
     """
@@ -270,9 +253,8 @@ def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Shoul
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
 
     minremainder, Rforminremainder, indexCount = 10000, 1, 0
-    rvals = list(range(2, int(N/2)))
-    print(rvals)
-    for r in range(2, int(N/2)): 
+    rvals = list(range(2, int(N/2)-1))
+    for r in rvals: 
         remainders = [] 
         for i in range(size):
             temp = fractionalVals[i]*r
@@ -288,7 +270,6 @@ def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Shoul
     plt.xticks(xticks)
     plt.xlabel("r (period value)", fontsize = 12)
     plt.ylabel("total remainder values", fontsize = 12)
+    plt.show()
 
-
-
-periodgraph(91, 15)
+#periodgraph(91, 19)
