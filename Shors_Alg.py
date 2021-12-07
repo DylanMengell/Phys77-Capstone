@@ -204,10 +204,10 @@ def ShorsAlgo(N):
 
         #4 Use the quantum period-finding subroutine to find r
 
-        r = QuantPeriodFinding(N, a)                                #yet to be made but will return r
+        r = QuantPeriodFinding(N, a)                           
 
         #5 If r is even and if (a**(r/2))%N != N-1 then the factors are as such:
-        if ((r % 2) == 0) and ((a**(r/2))%N != N-1):                 
+        if ((r % 2) == 0) and ((a**int(r/2))%N != N-1):                 
             non_trivial_divisor1 = euclideanAlg(int(a**(r/2) - 1), N)
             non_trivial_divisor2 = euclideanAlg(int(a**(r/2) + 1), N)
             return non_trivial_divisor1, non_trivial_divisor2
