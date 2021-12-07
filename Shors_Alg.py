@@ -106,9 +106,9 @@ def Q(f, n_input):
 
 def euclideanAlg(a,N): 
     """euclidean algorithm for finding GCD"""
-    if a == 0:
+    if a == 0:                                  #Once a = 0, we can return N
         return N
-    else:
+    else:                                       #recursion so that N%a is the new 'a' and the old 'a' becomes the new value for N
         return euclideanAlg(N % a, a)
 
 #Simon's Period-Finding Alg. (Part 1, Quantum Computation) (returns bitstrings)
@@ -185,9 +185,10 @@ def QuantPeriodFinding(N : int, a : int) -> int:
 
 #Put the Composite Number Here
 def ShorsAlgo(N):
+    #Check is N is even, if so we can skip everything and return 2 & N/2
     if (N % 2) == 0:
             return 2, int(N/2)
-    tries = 0
+    tries = 0  #initialize 'tries' at 0 to keep count of loops
     while tries < int(math.log2(N)):
         #0) Keep track of number of iterations through while loop (if too large, we have confidence N is prime) 
         tries += 1
@@ -205,7 +206,6 @@ def ShorsAlgo(N):
             return non_trivial_factor, int(N/non_trivial_factor)
 
         #4 Use the quantum period-finding subroutine to find r
-
         r = QuantPeriodFinding(N, a)  
         print("r =", r)
         if r == None:
@@ -233,19 +233,16 @@ print(ShorsAlgo(89))
 
 #Useful Visualization Functions (used to generate diagrams for presentation)
 
-def visualize_f(N,a):
-    """plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html"""
-
-    y = []
-
+def visualize_f(N,a):                                                                           #plot to show the periodicity of function & to prove there is a true period
+    """Plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html"""
+    y = []                                                                                      #create an array for y values
     def f(x):
-        return (a**x)%N
-
+        return (a**x)%N                                                                         #define a function (a*x)%N to show periodicity
     x = np.arange(N)
-    for i in range(N):
+    for i in range(N):                                                                          #loop to create Y values
         b = f(i)
         y.append(b)
-    plt.plot(x, y)
+    plt.plot(x, y)                                                                              #plot
     plt.ylabel(r"${0}^x$ mod ${1}$".format(a,N))
     plt.xlabel(r"$x$")
     plt.title(r"Periodic Function in Shor's Alg: $f(x)={0}^x$ mod ${1}$".format(a,N))
