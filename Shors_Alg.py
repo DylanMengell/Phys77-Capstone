@@ -192,8 +192,8 @@ def ShorsAlgo(N):
             return 2, int(N/2)
     while True:
         #1) Pick a random number 1<a<N
-        a = np.random.randint(1,N)                                  #possibly find better random num gen
-
+        a = np.random.randint(1,N) 
+                                         
         #2) Compute K = GCD(a,N) using Euclidean Algorithm 
         K = euclideanAlg(a, N)
 
@@ -206,10 +206,10 @@ def ShorsAlgo(N):
 
         r = QuantPeriodFinding(N, a)                                #yet to be made but will return r
 
-        #5 & 6 If r is even and if a^r/2 != -1%N then the factors are as such:
-        if ((r % 2) == 0) and (a**(r/2) != (-1)%N):                 #should this be 'and' or 'or'????
-            non_trivial_divisor1 = euclideanAlg(a**(r/2) + 1, N)
-            non_trivial_divisor2 = euclideanAlg(a**(r/2) - 1, N)
+        #5 If r is even and if (a**(r/2))%N != N-1 then the factors are as such:
+        if ((r % 2) == 0) and ((a**(r/2))%N != N-1):                 
+            non_trivial_divisor1 = euclideanAlg(int(a**(r/2) - 1), N)
+            non_trivial_divisor2 = euclideanAlg(int(a**(r/2) + 1), N)
             return non_trivial_divisor1, non_trivial_divisor2
 
 #Useful Visualization Functions (used to generate diagrams for presentation)
