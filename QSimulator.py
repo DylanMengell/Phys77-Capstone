@@ -1,3 +1,13 @@
+"""This was a piece of code that we thought may be necessary
+to implement Shor's Algorithm on a classical computer. It takes in
+a sequence of quantum gates and the wires they should be applied to.
+It then returns the result of a quantum computation with those gates
+applied to the specified wires. However, not only is this code quite 
+slow, it turns out to be overkill for our version of Shor's algorithm. 
+Nevertheless, I think the code is very insightful from a pedagogical 
+standpoint for those who are interested in learning about quantum 
+computing. Feel free to peruse the code at your leasure."""
+
 import numpy as np
 from cmath import polar
 from functools import reduce
@@ -83,10 +93,10 @@ def tensor_product(a,b):
     return a
 
 #Main Code, Quantum Simulator with Measurement
-def QSimulator(gates, wires, n):
+def QSimulator(gates, wires, n, size=1):
     """Takes a LIST of gates (e.g. [H,CNOT,DFT]) and a nested list wires (e.g. [[1],[1,3],[1,2,3,4]])
     
-    returns bitstring corresponding to a measurement of final state
+    returns list of bitstrings corresponding to measurements of final state
     
     initial state is assumed to be |00...0>"""
     #initialize variables and state
@@ -130,9 +140,9 @@ def QSimulator(gates, wires, n):
     #perform quantum computation with matrix multiplication
     for a in range(len(modified_gates)):
         state = np.dot(modified_gates[a],state)
-    #return bitstring corresponding to random measurement of state
-    return measure(state)
+    #return list of bitstrings corresponding to random measurements of state
+    return [measure(state) for i in range(size)]
 
 #Test with 3 qubits; should get 50% '000' and 50% '101'
-test = [QSimulator([H, CNOT],[[1],[1,3]],3) for i in range(10)]
+test = QSimulator([H, CNOT],[[1],[1,3]],3,size=10)
 print(test)
