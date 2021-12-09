@@ -162,7 +162,7 @@ def QuantPeriodFinding(N : int, a : int) -> int:
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
 
     minremainder, Rforminremainder, indexCount = 10000, 1, 0
-    for r in range(2, int(N/2)): 
+    for r in range(2, N-1): 
         remainders = [] 
         for i in range(size):
             temp = fractionalVals[i]*r
@@ -188,6 +188,8 @@ def ShorsAlgo(N):
     #Check is N is even, if so we can skip everything and return 2 & N/2
     if (N % 2) == 0:
             return 2, int(N/2)
+    if (N % 3) == 0:
+            return 3, int(N/3)
     tries = 0  #initialize 'tries' at 0 to keep count of loops
     while tries < int(math.log2(N))-1:
         #0) Keep track of number of iterations through while loop (if too large, we have confidence N is prime) 
@@ -253,8 +255,8 @@ def visualize_f(N,a):                                                           
     y = []                                                                                      #create an array for y values
     def f(x):
         return (a**x)%N                                                                         #define a function (a*x)%N to show periodicity
-    x = np.arange(N)
-    for i in range(N):                                                                          #loop to create Y values
+    x = range(N)
+    for i in x:                                                                          #loop to create Y values
         b = f(i)
         y.append(b)
     plt.plot(x, y)                                                                              #plot
@@ -262,6 +264,8 @@ def visualize_f(N,a):                                                           
     plt.xlabel(r"$x$")
     plt.title(r"Periodic Function in Shor's Alg: $f(x)={0}^x$ mod ${1}$".format(a,N))
     plt.show()
+
+#visualize_f(91, 19)
 
 def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Should return r
     """
@@ -284,7 +288,7 @@ def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Shoul
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
 
     minremainder, Rforminremainder, indexCount = 10000, 1, 0
-    rvals = list(range(2, int(N/2)-1))
+    rvals = list(range(2, N-1))
     for r in rvals: 
         remainders = [] 
         for i in range(size):
