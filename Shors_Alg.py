@@ -174,7 +174,7 @@ def QuantPeriodFinding(N : int, a : int) -> int:
         indexCount += 1
     secondary_checks = [4,3,2]
     for check in secondary_checks:
-        if (a**int(Rforminremainder/check))%N == 1:
+        if Rforminremainder%check == 0 and (a**int(Rforminremainder/check))%N == 1:
             return int(Rforminremainder/check)
     if (a**int(Rforminremainder))%N == 1:
         return Rforminremainder
@@ -189,12 +189,13 @@ def ShorsAlgo(N):
     if (N % 2) == 0:
             return 2, int(N/2)
     tries = 0  #initialize 'tries' at 0 to keep count of loops
-    while tries < int(math.log2(N)):
+    while tries < int(math.log2(N))-1:
         #0) Keep track of number of iterations through while loop (if too large, we have confidence N is prime) 
+        print("")
         tries += 1
 
         #1) Pick a random number 1<a<N
-        a = np.random.randint(1,N)
+        a = np.random.randint(2,N)
         print("a =", a) 
                                          
         #2) Compute K = GCD(a,N) using Euclidean Algorithm 
@@ -208,7 +209,7 @@ def ShorsAlgo(N):
         #4 Use the quantum period-finding subroutine to find r
         r = QuantPeriodFinding(N, a)  
         print("r =", r)
-        if r == None:
+        if r == None or r == 0:
             continue #if we fail to find the period of f(x) = (a**x)%N, we just pick a new value of a                        
 
         #5 If r is even and if (a**(r/2))%N != N-1 then the factors are as such:
@@ -227,9 +228,23 @@ def ShorsAlgo(N):
             non_trivial_divisor1 = euclideanAlg(a**int(r/2) - 1, N)
             non_trivial_divisor2 = euclideanAlg(a**int(r/2) + 1, N)
             return non_trivial_divisor1, non_trivial_divisor2
-    return "Having run through Shor's algorithm {0} times, we have confidence that {1} is prime.".format(tries, N)
+    print("")
+    print("Having run through Shor's algorithm {0} times, we have confidence that {1} is prime.".format(tries, N))
+    return None
 
-print(ShorsAlgo(89))
+#Basic UI
+
+print("")
+while True:
+    N = input("What integer N would you like to factorize? ")
+    try:
+        N = int(N)
+        break
+    except:
+        print("Sorry, your response could not be interpreted as an integer. Please try again.")
+        print("")
+print("factors =", ShorsAlgo(N))
+print("")
 
 #Useful Visualization Functions (used to generate diagrams for presentation)
 
@@ -284,8 +299,9 @@ def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Shoul
     plt.figure(figsize=(12, 6), dpi=80)
     plt.plot(rvals, remainderTotals, '--o')
     plt.xticks(xticks)
-    plt.xlabel("r (period value)", fontsize = 12)
-    plt.ylabel("total remainder values", fontsize = 12)
+    plt.title(r'"Fourier Transform" of $f(x)={0}^x$ (mod ${1}$)'.format(a,N), fontsize = 14)
+    plt.xlabel(r"Possible Values for $r$", fontsize = 12)
+    #plt.ylabel("total remainder values", fontsize = 12)
     plt.show()
 
 #periodgraph(91, 19)
