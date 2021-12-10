@@ -16,17 +16,21 @@ def tensor_product(a,b):
     a.shape = (shape_a[0]*shape_b[0],shape_a[1]*shape_b[1])
     return a
 
+#The Hadamard Gate
 H = 0.5**0.5 * np.array([[1, 1],\
                          [1, -1]]) 
 
 def HFT(n):
     """Hadamard Transform"""
+    #recursively take tensor product of Hadamard gate n times
+    #(could be implemented iteratively as well)
     if n == 1:
         return H
     return tensor_product(HFT(n-1),H)
 
 def DFT(N):
     """Discrete Fourier Transform"""
+    #not strictly necessary for algorithm, but we need IDFT, so we might as well show how to make DFT
     output = np.empty([N,N],dtype=complex)
     omega = exp(2*np.pi*1j/N)
     for i in range(N):
@@ -37,6 +41,9 @@ def DFT(N):
 
 def IDFT(N):
     """Inverse Discrete Fourier Transform"""
+    #in a real quantum circuit, this would be implemented with a series 
+    #of strategically placed of Hadamard and controlled rotation gates, 
+    #but since we're just using matrices, we might as well construct IDFT directly
     output = np.empty([N,N],dtype=complex)
     omega = exp(2*np.pi*1j/N)
     for i in range(N):
@@ -47,9 +54,10 @@ def IDFT(N):
 
 def bitwiseXOR(string1, string2):
     """performs bitwise XOR of two strings of the same length"""
+    #very important operation for quantum implementation of classical function
     output = ""
     for i in range(len(string1)):
-        output += str((int(string1[i])+int(string2[i]))%2)
+        output += str((int(string1[i])+int(string2[i]))%2) #XOR is the same as addition mod 2
     return output
 
 def measure(state):
@@ -58,8 +66,7 @@ def measure(state):
     remember that a column vector [a_1, a_2, ..., a_N] has probabilty amp_to_prob(a_i) of resulting in 
     a measurement of |bit(i)> where bit(i) is the bitstring associated with the number i"""
     
-    #this is fairly standard notation 
-    #n --> number of qubits; N --> dimension of vectorspace we're dealing with
+    #fairly standard notation: n --> number of qubits; N = 2**n --> dimension of vectorspace we're dealing with
     N = len(state)
     n = int(np.log2(N))
     #generate random number from 0 to 1
@@ -93,30 +100,34 @@ def Q(f, n_input):
     #figure out where to insert 1s in order to make correct matrix
     for x in range(2**n_input):
         raw_bit_x = format(x,"b")
-        bit_x = ('0'*(n_input-len(raw_bit_x)))+raw_bit_x
+        bit_x = ('0'*(n_input-len(raw_bit_x)))+raw_bit_x #x --> possible input in input register
         classical_output = output_to_bit[f(x)]
         raw_bit_output = format(classical_output,"b")
-        bit_output = ('0'*(n_output-len(raw_bit_output)))+raw_bit_output
+        bit_output = ('0'*(n_output-len(raw_bit_output)))+raw_bit_output #bit version of f(x)
         for b in range(2**n_output):
             raw_b = format(b,"b")
-            bit_b = ('0'*(n_output-len(raw_b)))+raw_b
-            modified_output = bitwiseXOR(bit_b,bit_output)
-            output[int(bit_x+modified_output,2),int(bit_x+bit_b,2)] = 1 #key line: implements qcomputing law for generating matrix of Qf
+            bit_b = ('0'*(n_output-len(raw_b)))+raw_b #possible input in output register 
+            #this next line is key: it implements the qcomputing law for generating matrix of Qf
+            #simple repeat input register and bitwiseXOR output register with f(x)
+            output[int(bit_x+bitwiseXOR(bit_b,bit_output),2),int(bit_x+bit_b,2)] = 1 
     return output
 
 def euclideanAlg(a,N): 
     """euclidean algorithm for finding GCD"""
     if a == 0:                                  #Once a = 0, we can return N
         return N
-    else:                                       #recursion so that N%a is the new 'a' and the old 'a' becomes the new value for N
+    else:                                       #recursion: gcd(a,N) = gcd(N%a, a)
         return euclideanAlg(N % a, a)
 
 #Simon's Period-Finding Alg. (Part 1, Quantum Computation) (returns bitstrings)
 
 def internalQuantPerFind(N, a, size):
-    """takes N, a, and integer size
-    returns list of bitstrings results from measurement of quantum state
+    """takes N, a, and size (int)
+    executes rotate-compute-rotate paradigm
+    returns list of bitstrings resulting from measurement of final quantum state
     each bitstring should give a hint as to the period of f(x) = (a**x)%N"""
+    
+    #fairly standard notation: n --> number of qubits; N = 2**n --> dimension of vectorspace we're dealing with
     n = math.ceil(math.log2(N))
     
     def f(x):
@@ -126,18 +137,19 @@ def internalQuantPerFind(N, a, size):
     compute = Q(f,n)
     n_total = int(math.log2(np.shape(compute)[0]))
 
-    #generate two rotations gates
+    #generate necessary rotations gates
     rotate1 = tensor_product(HFT(n),np.identity(2**(n_total-n)))
     rotate2 = tensor_product(IDFT(2**n),np.identity(2**(n_total-n)))
     
     #execute quantum computation
     state = np.zeros(2**n_total)
-    state[0] = 1
+    state[0] = 1 #initializes state to be |00...0>
     for gate in [rotate1,compute,rotate2]:
         state = np.dot(gate,state)
     
     #measure final state "size" times
     return [measure(state)[0:n] for i in range(size)] #will return a list of bitstrings of length 'size'
+    #according to the algorithm, each bistring should have the property that int(bitstring,2)/len(bitstring)*r should be close to an integer
 
 #Simon's Period-Finding Alg. (Part 2, Using Bitstrings to Find Period)
 
@@ -185,14 +197,14 @@ def QuantPeriodFinding(N : int, a : int) -> int:
 
 #Put the Composite Number Here
 def ShorsAlgo(N):
-    #Check is N is even, if so we can skip everything and return 2 & N/2
+    #Check is N is some easy factors. If satisfied, we can skip everything and return 
     if (N % 2) == 0:
             return 2, int(N/2)
     if (N % 3) == 0:
             return 3, int(N/3)
     tries = 0  #initialize 'tries' at 0 to keep count of loops
     while tries < int(math.log2(N))-1:
-        #0) Keep track of number of iterations through while loop (if too large, we have confidence N is prime) 
+        #0) Increment number of iterations through while loop (if too large, we have confidence N is prime) 
         print("")
         tries += 1
 
@@ -239,6 +251,7 @@ def ShorsAlgo(N):
 print("")
 while True:
     N = input("What integer N would you like to factorize? ")
+    #check that inputted string can be interpreted as an integer
     try:
         N = int(N)
         break
@@ -250,16 +263,25 @@ print("")
 
 #Useful Visualization Functions (used to generate diagrams for presentation)
 
-def visualize_f(N,a):                                                                           #plot to show the periodicity of function & to prove there is a true period
-    """Plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html"""
-    y = []                                                                                      #create an array for y values
+def visualize_f(N,a):                                                                           
+    """plot to show the periodic nature of function f(x)=(a**x)%N
+    
+    Plot same as to https://qiskit.org/textbook/ch-algorithms/shor.html"""
+    #define function in question 
     def f(x):
-        return (a**x)%N                                                                         #define a function (a*x)%N to show periodicity
+        return (a**x)%N
+    
+    #generate x-values
     x = range(N)
-    for i in x:                                                                          #loop to create Y values
+
+    #generate y-values with loop
+    y = []     
+    for i in x:    
         b = f(i)
         y.append(b)
-    plt.plot(x, y)                                                                              #plot
+    
+    #plot and show function (with LaTeX labels)
+    plt.plot(x, y)                                                                           
     plt.ylabel(r"${0}^x$ mod ${1}$".format(a,N))
     plt.xlabel(r"$x$")
     plt.title(r"Periodic Function in Shor's Alg: $f(x)={0}^x$ mod ${1}$".format(a,N))
