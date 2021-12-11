@@ -164,26 +164,29 @@ def QuantPeriodFinding(N : int, a : int) -> int:
     returns: 
         r: the period of the function (a^x) mod N, which will help us find factors of N
     """
-    size = 1000
-    bitstrings = internalQuantPerFind(N, a, size) 
-    base10vals, numbits, fractionalVals, remainderTotals = [], [], [], []
+    size = 1000  #initalize number of bit strings to be returned from internalQuantPerFind
+    bitstrings = internalQuantPerFind(N, a, size)  #call internalQuantPerFind and get bit strings
+    base10vals, numbits, fractionalVals, remainderTotals = [], [], [], []  #initialize containers
 
+    #loop through the list of bit strings converting to base 10 and dividing by 2^(# of bits)
     for i in range(size):
          base10vals.append(int(bitstrings[i], 2)) #converts value to base 10
          numbits.append(len(bitstrings[i])) #stores the number of bits in given string
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
 
-    minremainder, Rforminremainder, indexCount = 10000, 1, 0
-    for r in range(2, N-1): 
-        remainders = [] 
+    minremainder, Rforminremainder, indexCount = 10000, 1, 0 #initalize variables to find the minimum remainder of our calculation
+    for r in range(2, N-1):  #pick a value of r within the given range
+        remainders = []  
         for i in range(size):
+            #multiply r by the fractional values and total the remainder to the neareest integer
             temp = fractionalVals[i]*r
             remainders.append(min(temp-int(temp),int(temp)+1-temp))
         remainderTotals.append(np.sum(remainders))
-        if(remainderTotals[indexCount] < minremainder):
+        if(remainderTotals[indexCount] < minremainder): #keep track of the smallest remainder from this calculation
             minremainder = remainderTotals[indexCount]
             Rforminremainder = r
         indexCount += 1
+    #check if given value of r is the period. that is that if f(r) = 1. then return r, same goes for frations of r
     secondary_checks = [4,3,2]
     for check in secondary_checks:
         if Rforminremainder%check == 0 and (a**int(Rforminremainder/check))%N == 1:
