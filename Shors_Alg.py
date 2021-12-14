@@ -231,17 +231,6 @@ def ShorsAlgo(N):
 
         #5 If r is even and if (a**(r/2))%N != N-1 then the factors are as such:
         if ((r % 2) == 0) and ((a**int(r/2))%N != N-1):
-            """bit_power = format(int(r/2),"b")
-            a_power_2 = [a]
-            for i in range(len(bit_power)-1):
-                a_power_2.append((a_power_2[i]**2)%N)
-            result = 1
-            for i in range(len(bit_power)):
-                if bit_power[::-1][i] == "1":
-                    result *= a_power_2[i]
-            result %= N #should give a**(r/2)%N
-            non_trivial_divisor1 = euclideanAlg(result - 1, N)
-            non_trivial_divisor2 = euclideanAlg(result + 1, N)"""
             non_trivial_divisor1 = euclideanAlg(a**int(r/2) - 1, N)
             non_trivial_divisor2 = euclideanAlg(a**int(r/2) + 1, N)
             return non_trivial_divisor1, non_trivial_divisor2
