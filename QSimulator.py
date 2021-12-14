@@ -64,14 +64,7 @@ def measure(state):
 def binaryToDecimal(bitstring):
     """takes bitstring 
     returns decimal equivalent"""
-    binary = int(bitstring)
-    decimal, i = 0, 0
-    while(binary != 0):
-        dec = binary % 10
-        decimal = decimal + dec * pow(2, i)
-        binary = binary//10
-        i += 1
-    return decimal 
+    return int(bitstring,2) 
 
 def bra_ket(bitstring1,bitstring2):
     """takes two bitstrings 
@@ -85,6 +78,9 @@ def bra_ket(bitstring1,bitstring2):
     return output
 
 def tensor_product(a,b):
+    """fast tensor product
+    
+    from https://stackoverflow.com/questions/56067643/speeding-up-kronecker-products-numpy"""
     shape_a = np.shape(a)
     shape_b = np.shape(b)
     a = a[:,np.newaxis,:,np.newaxis]
