@@ -1,6 +1,8 @@
 """This was one of our preliminary tests to see if
 our implementation of the Discrete Fourier Transform 
-and Inverse Discrete Fourier Transforms was working."""
+and Inverse Discrete Fourier Transforms was working.
+Feel free to run it as is or edit it to print something 
+different."""
 
 from cmath import exp
 import numpy as np

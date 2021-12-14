@@ -1,3 +1,6 @@
+"""Simply run this code to start factoring integers. The UI
+should ask you for a number automatically."""
+
 import math
 import numpy as np
 from cmath import polar, exp
