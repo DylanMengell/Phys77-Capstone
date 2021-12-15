@@ -209,7 +209,15 @@ def ShorsAlgo(N):
     if (N % 3) == 0:
             return 3, int(N/3)
     tries = 0  #initialize 'tries' at 0 to keep count of loops
-    while tries < int(math.log2(N))-1:
+    while tries < int(math.log2(N))-1:                                                  
+        """ We probably need to increase this number because after running it a couple times testing '25' the program
+            returns "confident in primality" because it only tests 3 values for a, which I agree with, we need a limit 
+            or else the program will run for a super long time. But, we probably need to increase it. Or- we don't and
+            in our write up we just talk about it saying like "We want to have more guesses for 'a' but our program 
+            run time would be very long in some cases, so we have the limit of tries at log2(N) - 1, which may be small 
+            but the program will run, just may return a conclusion giving a false prime statement.
+        """
+
         #0) Increment number of iterations through while loop (if too large, we have confidence N is prime) 
         print("")
         tries += 1
