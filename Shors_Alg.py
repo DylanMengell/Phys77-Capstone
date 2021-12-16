@@ -168,36 +168,43 @@ def QuantPeriodFinding(N : int, a : int) -> int:
         r: the period of the function (a^x) mod N, which will help us find factors of N
     """
     size = 1000  #initalize number of bit strings to be returned from internalQuantPerFind
-    bitstrings = internalQuantPerFind(N, a, size)  #call internalQuantPerFind and get bit strings
-    base10vals, numbits, fractionalVals, remainderTotals = [], [], [], []  #initialize containers
+    bitstrings = internalQuantPerFind(N, a, size)  #call internalQuantPerFind and get the set of bit strings
+    base10vals, fractionalVals, remainderTotals = [], [], []  #create containers that will be used to calculate the correct value of r
 
     #loop through the list of bit strings converting to base 10 and dividing by 2^(# of bits)
     for i in range(size):
          base10vals.append(int(bitstrings[i], 2)) #converts value to base 10
-         numbits.append(len(bitstrings[i])) #stores the number of bits in given string
-         fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
+         fractionalVals.append(base10vals[i]/2**(len(bitstrings[i]))) #divides the bit value by 2^(# of bits)
 
     minremainder, Rforminremainder, indexCount = 10000, 1, 0 #initalize variables to find the minimum remainder of our calculation
     for r in range(2, N-1):  #pick a value of r within the given range
-        remainders = []  
-        for i in range(size):
-            #multiply r by the fractional values and total the remainder to the neareest integer
-            temp = fractionalVals[i]*r
-            remainders.append(min(temp-int(temp),int(temp)+1-temp))
-        remainderTotals.append(np.sum(remainders))
-        if(remainderTotals[indexCount] < minremainder): #keep track of the smallest remainder from this calculation
-            minremainder = remainderTotals[indexCount]
-            Rforminremainder = r
-        indexCount += 1
+        #the ideal r value will multiply by each fractional value and the result of that calculation will be an integer
+        #   this set of loops will test values of r in an attempt to minimize the remainders of the calculation described
+        #   above. it will then return the r value that has the smallest total remainders
+
+        remainders = []  #temporary container for the remainders of each calculation
+        for i in range(size): #loop through each fracional value
+            temp = fractionalVals[i]*r #multiply r by the fractional value
+            remainders.append(min(temp-int(temp),int(temp)+1-temp)) #store the remainder of this calculation, to the nearest integer
+        remainderTotals.append(np.sum(remainders)) #total these remainders
+        if(remainderTotals[indexCount] < minremainder): #check if a given r value results in a smaller total remainder
+            minremainder = remainderTotals[indexCount] #if yes then reset the smallest total remainder container
+            Rforminremainder = r                       # also update the r value that associates to this new minimum
+        indexCount += 1  #incriment count that tracks the current r value index
+
     #check if given value of r is the period. that is that if f(r) = 1. then return r, same goes for frations of r
-    secondary_checks = [4,3,2]
-    for check in secondary_checks:
-        if Rforminremainder%check == 0 and (a**int(Rforminremainder/check))%N == 1:
-            return int(Rforminremainder/check)
-    if (a**int(Rforminremainder))%N == 1:
-        return Rforminremainder
+    secondary_checks = [4,3,2] #we want our r to be the smallest possible r. 
+                               #since r is the period of the function it is possible to have this r be a multiple of the 
+                               # true period. To counteract this we check fractonal multiples of r. 
+                               # we know we have the right r if F(r) = 1 
+                               # where F(x) = a^x Mod N 
+    for check in secondary_checks: #check these fractional multiples of r
+        if Rforminremainder%check == 0 and (a**int(Rforminremainder/check))%N == 1: #if we found a value that satisfies the check
+            return int(Rforminremainder/check) #return this value
+    if (a**int(Rforminremainder))%N == 1: #lastly check r itself
+        return Rforminremainder #if it passes the check then return r
     else:
-        return None
+        return None #if not then return 'none' which means we could not find the period of the function
 
 #Main Code: Shor's Algorithm
 
