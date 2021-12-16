@@ -211,6 +211,8 @@ def QuantPeriodFinding(N : int, a : int) -> int:
 #Put the Composite Number Here
 def ShorsAlgo(N):
     #Check if N is even.
+    if N == 0:
+        return (0, "All real integers")
     if (N % 2) == 0:
             return 2, int(N/2)
     #Check if N is square.
