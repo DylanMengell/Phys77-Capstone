@@ -203,13 +203,14 @@ def QuantPeriodFinding(N : int, a : int) -> int:
 
 #Put the Composite Number Here
 def ShorsAlgo(N):
-    #Check is N is some easy factors. If satisfied, we can skip everything and return 
+    #Check if N is even.
     if (N % 2) == 0:
             return 2, int(N/2)
-    if (N % 3) == 0:
-            return 3, int(N/3)
+    #Check if N is square.
+    if int(N**0.5) == N**0.5:
+        return int(N**0.5),int(N**0.5)
     tries = 0  #initialize 'tries' at 0 to keep count of loops
-    while tries < int(math.log2(N))-1:
+    while tries < max(4,int(math.log2(N))-1):
         #0) Increment number of iterations through while loop (if too large, we have confidence N is prime) 
         print("")
         tries += 1
