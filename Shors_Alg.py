@@ -316,7 +316,7 @@ def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Shoul
          fractionalVals.append(base10vals[i]/2**(numbits[i])) #calculates fractional value for each val #/2^num bits
 
     minremainder, Rforminremainder, indexCount = 10000, 1, 0
-    rvals = list(range(2, N-1))
+    rvals = list(range(2, N//2-1))
     for r in rvals: 
         remainders = [] 
         for i in range(size):
@@ -327,13 +327,13 @@ def periodgraph(N : int, a : int) -> int: #quantum Period finding algorthm Shoul
             minremainder = remainderTotals[indexCount]
             Rforminremainder = r
         indexCount += 1
-    xticks = np.arange(0,N/2+1,2)
+    xticks = np.arange(0,N//2+1,2)
     plt.figure(figsize=(12, 6), dpi=80)
     plt.plot(rvals, remainderTotals, '--o')
     plt.xticks(xticks)
     plt.title(r'"Fourier Transform" of $f(x)={0}^x$ (mod ${1}$)'.format(a,N), fontsize = 14)
     plt.xlabel(r"Possible Values for $r$", fontsize = 12)
-    #plt.ylabel("total remainder values", fontsize = 12)
+    #plt.ylabel(r"how close $\left(\frac{x}{2^{len(x)}}\cdot r\right)$ is to an integer, on average for bistrings $x$", fontsize = 12)
     plt.show()
 
 #periodgraph(91, 19)
